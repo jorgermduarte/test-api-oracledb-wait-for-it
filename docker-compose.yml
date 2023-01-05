@@ -1,0 +1,26 @@
+
+
+version: '3.7'
+
+services:
+  oracle-db:
+    image: oracle/database:20.4.0-ee # this image requires the email registration on ( Oracle Container Registry )
+    environment:
+      - ORACLE_PWD=oracle
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+
+  node-app:
+    build: .
+    depends_on:
+      - oracle-db
+    command: ./wait-for-it.sh oracle-db:1521 -- npm start
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+
+volumes:
+  oracle-data:
